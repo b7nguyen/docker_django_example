@@ -1,0 +1,38 @@
+services:
+  db:
+    # Image answers what db will be installed? 
+    image: postgres
+
+    # Where will data persist in the docker container? 
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+
+    # Environment variables
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+  web:
+    # Where will we be building the web service? Using . states current directory same as the Dockerfile
+    build: .
+
+    # What is the command to start the web server? 
+    command: python manage.py runserver 0.0.0.0:8000
+
+    # Where will the code be mapped to in the container so that changes on the host will be reflected in container
+    volumes:
+      - .:/code
+
+    # Where will port 8000 on host be mapped to in container? 
+    ports:
+      - "8000:8000"
+
+    # What are the environment variables that is used to start the web service? 
+    environment:
+      - POSTGRES_NAME=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+    # How do we get the web service to start AFTER the db? 
+    depends_on:
+      - db
